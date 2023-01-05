@@ -132,4 +132,85 @@ public class ZippoTest {
                 .body("places[0].'place name'", equalTo("Beverly Hills")) // verilen path deki değer buna eşit mi
         ;
     }
+
+    @Test
+    public void pathParamTest(){
+
+        given()
+                .pathParam("Country", "us")
+                .pathParam("ZipKod", 90210)
+                .log().uri() // request link  Request URI:	http://api.zippopotam.us/us/90210
+
+                .when()
+                .get("http://api.zippopotam.us/{Country}/{ZipKod}")
+
+                .then()
+                .log().body()
+                .statusCode(200)
+        ;
+    }
+
+    @Test
+    public void pathParamTest2(){
+        // 90210 dan 90213 kadar test sonuçlarında places in size nın hepsinde 1 gediğini test ediniz.
+
+        for(int i=90210; i<= 90213 ; i++) {
+            given()
+                    .pathParam("Country", "us")
+                    .pathParam("ZipKod", i)
+                    .log().uri()
+
+                    .when()
+                    .get("http://api.zippopotam.us/{Country}/{ZipKod}")
+
+                    .then()
+                    .log().body()
+                    .statusCode(200)
+                    .body("places", hasSize(1))
+            ;
+        }
+    }
+
+    @Test
+    public void queryParamTest(){
+        // https://gorest.co.in/public/v1/users?page=3
+
+        given()
+                .param("page",1)  // ?page=1  şeklinde linke ekleniyor
+                .log().uri()
+
+                .when()
+                .get("https://gorest.co.in/public/v1/users")
+
+                .then()
+                .log().body()
+                .statusCode(200)
+                .body("meta.pagination.page", equalTo(1))
+        ;
+    }
+
+    @Test
+    public void queryParamTest2(){
+        // https://gorest.co.in/public/v1/users?page=3
+        // bu linkteki 1 den 10 kadar sayfaları çağırdığınızda response daki donen page degerlerinin
+        // çağrılan page nosu ile aynı olup olmadığını kontrol ediniz.
+
+        for(int pageNo=1; pageNo <=10 ; pageNo++) {
+            given()
+                    .param("page", pageNo)  // ?page=1  şeklinde linke ekleniyor
+                    .log().uri()
+
+                    .when()
+                    .get("https://gorest.co.in/public/v1/users")
+
+                    .then()
+                    .log().body()
+                    .statusCode(200)
+                    .body("meta.pagination.page", equalTo(pageNo))
+            ;
+        }
+
+    }
+
+
 }
