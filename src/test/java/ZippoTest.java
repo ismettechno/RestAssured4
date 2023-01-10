@@ -370,8 +370,9 @@ public class ZippoTest {
     }
 
     @Test
-    public void extractingJsonPOJO()
-    {
+    public void extractingJsonPOJO() // POJO : JSon Object i
+    {    // POJO (Plain Old Java Object)
+
 //        Ogrenci ogr=new Ogrenci();
 //        ogr.id=1;
 //        ogr.isim="ismet temur";
