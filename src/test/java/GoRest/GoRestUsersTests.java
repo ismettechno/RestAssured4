@@ -26,7 +26,7 @@ public class GoRestUsersTests {
 
     public String getRandomEmail() { return RandomStringUtils.randomAlphabetic(8).toLowerCase()+"@gmail.com"; }
 
-    @Test
+    @Test(enabled = false)
     public void createUserObject()
     {
         // başlangıç işlemleri
@@ -55,7 +55,7 @@ public class GoRestUsersTests {
         System.out.println("userID = " + userID);
     }
 
-    @Test
+    @Test(enabled = false)
     public void createUserObject2WithMap()
     {
         Map<String,String> newUser=new HashMap<>();
@@ -116,7 +116,7 @@ public class GoRestUsersTests {
         // jsonPath : class dönüşümüne ve tip dönüşümüne izin vererek , veriyi istediğimiz formatta verir.
     }
 
-    @Test(dependsOnMethods = "createUserObject3WithObject")
+    @Test(dependsOnMethods = "createUserObject3WithObject", priority = 1)
     public void getUserByID()
     {
                 given()
@@ -134,6 +134,74 @@ public class GoRestUsersTests {
                         .body("id",equalTo(userID))
         ;
     }
+
+    @Test(dependsOnMethods = "createUserObject3WithObject", priority = 2)
+    public void updateUserObject()
+    {
+        // newUser.setName("ismet temur");
+
+        Map<String,String> updateUser=new HashMap<>();
+        updateUser.put("name", "ismet temur");
+
+        given()
+                .header("Authorization", "Bearer 523891d26e103bab0089022d20f1820be2999a7ad693304f560132559a2a152d")
+                .pathParam("userId",userID)
+                .contentType(ContentType.JSON)
+                .body(updateUser)
+                .log().body()
+                .log().uri()
+
+                .when()
+                .put("/{userId}")
+
+                .then()
+                .log().body()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .body("id",equalTo(userID))
+                .body("name",equalTo("ismet temur"))
+        ;
+    }
+
+    @Test(dependsOnMethods = "updateUserObject", priority = 3)
+    public void deleteUserById()
+    {
+
+        given()
+                .header("Authorization", "Bearer 523891d26e103bab0089022d20f1820be2999a7ad693304f560132559a2a152d")
+                .pathParam("userId",userID)
+                .log().uri()
+
+                .when()
+                .delete("/{userId}")
+
+                .then()
+                .log().body()
+                .statusCode(204)
+        ;
+    }
+
+    @Test(dependsOnMethods = "deleteUserById")
+    public void deleteUserByIdNegative()
+    {
+
+        given()
+                .header("Authorization", "Bearer 523891d26e103bab0089022d20f1820be2999a7ad693304f560132559a2a152d")
+                .pathParam("userId",userID)
+                .log().uri()
+
+                .when()
+                .delete("/{userId}")
+
+                .then()
+                .log().body()
+                .statusCode(404)
+        ;
+    }
+
+
+
+
 
 }
 
